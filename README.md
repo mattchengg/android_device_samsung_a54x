@@ -29,7 +29,7 @@ It was announced and released in March 2023.
 
 ## Kernel source 
 
-Available at [https://github.com/BlackMesa123/android_kernel_samsung_s5e8835/tree/sep-15/twrp-12.1](https://github.com/BlackMesa123/android_kernel_samsung_s5e8835/tree/sep-15/twrp-12.1)
+Available at [https://github.com/Vaz15k/android_kernel_samsung_a54x/tree/twrp-12.1](https://github.com/Vaz15k/android_kernel_samsung_a54x/tree/twrp-12.1)
 
 ## How to build
 
@@ -71,3 +71,7 @@ mka recoveryimage
 # limitations under the License.
 #
 ```
+## Credits
+
+Thank you BlackMesa123 (Salvo), for all!
+
