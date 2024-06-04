@@ -90,7 +90,7 @@ jobs:
 
       - name: Cloning Trees
         run: |
-          git clone --branch twrp-12.1 https://github.com/Vaz15k/android_device_samsung_a54x.git device/samsung/a54x
+          git clone --branch twrp-12.1 https://github.com/mattchengg/android_device_samsung_a54x.git device/samsung/a54x
         working-directory: ./twrp-12.1
 
       - name: Removing TEE Files
