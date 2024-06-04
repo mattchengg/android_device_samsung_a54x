@@ -101,7 +101,7 @@ jobs:
           elif [ "${{ matrix.target }}" == "A546E" ]; then
             rm -fr device/samsung/a54x/recovery/root/vendor/tee/A546B*
             rm -fr device/samsung/a54x/recovery/root/vendor/tee/A5460*
-          elif [ "${{ matrix.target }}" == "A546E" ]; then
+          elif [ "${{ matrix.target }}" == "A5460" ]; then
             rm -fr device/samsung/a54x/recovery/root/vendor/tee/A546E*
             rm -fr device/samsung/a54x/recovery/root/vendor/tee/A546B*
           fi
