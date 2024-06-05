@@ -29,21 +29,30 @@ It was announced and released in March 2023.
 
 ## Kernel source 
 
+
+
 Available at [https://github.com/Vaz15k/android_kernel_samsung_a54x/tree/twrp-12.1](https://github.com/Vaz15k/android_kernel_samsung_a54x/tree/twrp-12.1)
+
 
 ## How to build
 
+
 This device tree was tested and is fully compatible with [minimal-manifest-twrp](https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp).
+
 
 1. Set up the build environment following the instructions [here](https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp/blob/twrp-12.1/README.md#getting-started)
 
+
 2. In the root folder of the fetched repo, clone the device tree:
 
+
 ```bash
-git clone https://github.com/Vaz15k/android_device_samsung_a54x.git -b twrp-12.1 device/samsung/a54x
+git clone https://github.com/mattchengg/android_device_samsung_a54x.git -b twrp-12.1 device/samsung/a54x
 ```
 
+
 3. To build:
+
 
 ```bash
 export ALLOW_MISSING_DEPENDENCIES=true
@@ -52,7 +61,9 @@ lunch twrp_a54x-eng
 mka recoveryimage
 ```
 
+
 ## Copyright
+
 
 ```
 #
@@ -73,5 +84,10 @@ mka recoveryimage
 ```
 ## Credits
 
-Thank you BlackMesa123 (Salvo), for all!
 
+Thank you BlackMesa123 (Salvo), for all!
+Thanks to Vaz15k for making a new version. 
+
+
+
+ 
