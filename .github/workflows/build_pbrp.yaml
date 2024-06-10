@@ -111,7 +111,7 @@ jobs:
         run: |
           export ALLOW_MISSING_DEPENDENCIES=true
           . build/envsetup.sh
-          lunch pb_a54x-eng && mka pbrp
+          lunch twrp_a54x-eng && mka pbrp
         working-directory: ./pbrp-12.1
 
       - name: Repack Image
