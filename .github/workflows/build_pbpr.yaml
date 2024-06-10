@@ -1,0 +1,141 @@
+name: Build PBPR
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  build_recovery:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [A546E, A546B, A5460]
+        
+    steps:          
+      - name: Cleanup
+        uses: rokibhasansagar/slimhub_actions@main
+        
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4.2.1
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Set Swap Space
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 12
+
+      - name: Set date variable
+        id: date
+        run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Install repo
+        run: |
+          mkdir ~/bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo -o ~/bin/repo
+          chmod a+x ~/bin/repo
+          sudo ln -sf ~/bin/repo /usr/bin/repo
+
+      - name: Setup Env
+        run: |
+          sudo apt install git aria2 -y
+          git clone https://gitlab.com/OrangeFox/misc/scripts ~/scripts
+          cd ~/scripts
+          sudo bash setup/android_build_env.sh
+          sed -i 's/cd -/cd ../g' setup/install_android_sdk.sh
+          sudo bash setup/install_android_sdk.sh
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Clean Dir
+        run: |
+          ls | xargs rm -fr
+
+      - name: Prepare extra files
+        run: |
+          mkdir ~/pbrp-build
+          curl https://raw.githubusercontent.com/Vaz15k/literate-potato/master/Tools/magiskboot -o ~/bin/magiskboot
+          chmod a+x ~/bin/magiskboot
+          sudo ln -sf ~/bin/magiskboot /usr/bin/magiskboot
+          
+          if [ "${{ matrix.target }}" == "A546B" ]; then
+            wget -t 3 --timeout=30  https://vaz15k.github.io/literate-potato/Imagens/A546B/recovery.img -O ~/twrp-build/recovery-A546B.img || curl https://raw.githubusercontent.com/Vaz15k/literate-potato/master/Imagens/A546B/recovery.img -o ~/twrp-build/recovery-A546B.img
+          elif [ "${{ matrix.target }}" == "A546E" ]; then
+            wget -t 3 --timeout=30  https://vaz15k.github.io/literate-potato/Imagens/A546E/recovery.img -O ~/twrp-build/recovery-A546E.img || curl https://raw.githubusercontent.com/Vaz15k/literate-potato/master/Imagens/A546E/recovery.img -o ~/twrp-build/recovery-A546E.img
+          elif [ "${{ matrix.target }}" == "A5460" ]; then
+            wget -t 3 --timeout=30  https://github.com/mattchengg/A5460-stock-recovery/raw/main/recovery.img -O ~/twrp-build/recovery-A5460.img || curl https://github.com/mattchengg/A5460-stock-recovery/raw/main/recovery.img -o ~/twrp-build/recovery-A5460.img
+          fi
+          
+      - name: Initialize repo
+        run: |
+          mkdir pbrp-12.1
+          cd pbrp-12.1
+          repo init -u https://github.com/PitchBlackRecoveryProject/manifest_pb -b android-12.1
+      
+      - name: Repo Sync
+        run: |
+          repo sync
+        working-directory: ./pbrp-12.1
+
+      - name: Cloning Trees
+        run: |
+          git clone https://github.com/mattchengg/android_device_samsung_a54x.git -b pbrp-12.1 device/samsung/a54x
+        working-directory: ./pbrp-12.1
+
+      - name: Removing TEE Files
+        run: |
+          if [ "${{ matrix.target }}" == "A546B" ]; then
+            rm -fr device/samsung/a54x/recovery/root/vendor/tee/A546E*
+            rm -fr device/samsung/a54x/recovery/root/vendor/tee/A5460*
+          elif [ "${{ matrix.target }}" == "A546E" ]; then
+            rm -fr device/samsung/a54x/recovery/root/vendor/tee/A546B*
+            rm -fr device/samsung/a54x/recovery/root/vendor/tee/A5460*
+          elif [ "${{ matrix.target }}" == "A5460" ]; then
+            rm -fr device/samsung/a54x/recovery/root/vendor/tee/A546E*
+            rm -fr device/samsung/a54x/recovery/root/vendor/tee/A546B*
+          fi
+        working-directory: ./pbrp-12.1
+      
+      - name: Build Recovery
+        run: |
+          export ALLOW_MISSING_DEPENDENCIES=true
+          . build/envsetup.sh
+          lunch pb_a54x-eng && mka pbrp
+        working-directory: ./pbrp-12.1
+
+      - name: Repack Image
+        run: |
+          mkdir ~/files
+          cp out/target/product/a54x/recovery.img ~/pbrp-build/pbrp.img
+          cd ~/pbpr-build
+          magiskboot unpack pbrp.img
+          magiskboot repack recovery-${{ matrix.target }}.img recovery.img
+          tar cf PBRP-${{ matrix.target }}_$(date +"%Y-%m-%d").tar recovery.img
+          cp PBRP* ~/files
+        working-directory: ./pbrp-12.1
+
+      - name: Publish to GitHub
+        id: release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: /home/runner/files/PBRP*
+          name: TWRP / OFRP / PBRP
+          tag_name: "${{ env.DATE }}"
+          body: |
+            VBMeta Patched:
+            https://github.com/Vaz15k/proprietary_vendor_samsung_a54x/releases
+            
+            :rocket: *Built with love by GitHub Actions.*
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
