@@ -70,11 +70,11 @@ jobs:
           sudo ln -sf ~/bin/magiskboot /usr/bin/magiskboot
           
           if [ "${{ matrix.target }}" == "A546B" ]; then
-            wget -t 3 --timeout=30  https://vaz15k.github.io/literate-potato/Imagens/A546B/recovery.img -O ~/twrp-build/recovery-A546B.img || curl https://raw.githubusercontent.com/Vaz15k/literate-potato/master/Imagens/A546B/recovery.img -o ~/twrp-build/recovery-A546B.img
+            wget -t 3 --timeout=30  https://vaz15k.github.io/literate-potato/Imagens/A546B/recovery.img -O ~/pbrp-build/recovery-A546B.img || curl https://raw.githubusercontent.com/Vaz15k/literate-potato/master/Imagens/A546B/recovery.img -o ~/pbbrp-build/recovery-A546B.img
           elif [ "${{ matrix.target }}" == "A546E" ]; then
-            wget -t 3 --timeout=30  https://vaz15k.github.io/literate-potato/Imagens/A546E/recovery.img -O ~/twrp-build/recovery-A546E.img || curl https://raw.githubusercontent.com/Vaz15k/literate-potato/master/Imagens/A546E/recovery.img -o ~/twrp-build/recovery-A546E.img
+            wget -t 3 --timeout=30  https://vaz15k.github.io/literate-potato/Imagens/A546E/recovery.img -O ~/pbrp-build/recovery-A546E.img || curl https://raw.githubusercontent.com/Vaz15k/literate-potato/master/Imagens/A546E/recovery.img -o ~/pbrp-build/recovery-A546E.img
           elif [ "${{ matrix.target }}" == "A5460" ]; then
-            wget -t 3 --timeout=30  https://github.com/mattchengg/A5460-stock-recovery/raw/main/recovery.img -O ~/twrp-build/recovery-A5460.img || curl https://github.com/mattchengg/A5460-stock-recovery/raw/main/recovery.img -o ~/twrp-build/recovery-A5460.img
+            wget -t 3 --timeout=30  https://github.com/mattchengg/A5460-stock-recovery/raw/main/recovery.img -O ~/pbrp-build/recovery-A5460.img || curl https://github.com/mattchengg/A5460-stock-recovery/raw/main/recovery.img -o ~/pbrp-build/recovery-A5460.img
           fi
           
       - name: Initialize repo
