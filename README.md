@@ -87,7 +87,7 @@ mka recoveryimage
 
 Thank you BlackMesa123 (Salvo), for all!
 
-Thanks to Vaz15k for making a new version. 
+Thanks you **[Vaz15k](https://github.com/Vaz15k)**
 
 
 
