@@ -81,11 +81,11 @@ jobs:
         run: |
           mkdir twrp-12.1
           cd twrp-12.1
-          repo init  --depth=1 -u https://github.com/PitchBlackRecoveryProject/manifest_pb -b android-12.1
+          repo init --depth=1 -u https://github.com/PitchBlackRecoveryProject/manifest_pb -b android-12.1
       
       - name: Repo Sync
         run: |
-          repo sync
+          repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j$(nproc --all)
         working-directory: ./twrp-12.1
 
       - name: Cloning Trees
