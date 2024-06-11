@@ -118,7 +118,7 @@ jobs:
         run: |
           mkdir ~/files
           cp out/target/product/a54x/recovery.img ~/twrp-build/twrp.img
-          cd ~/twpr-build
+          cd ~/twrp-build
           magiskboot unpack twrp.img
           magiskboot repack recovery-${{ matrix.target }}.img recovery.img
           tar cf PBRP-${{ matrix.target }}_$(date +"%Y-%m-%d").tar recovery.img
