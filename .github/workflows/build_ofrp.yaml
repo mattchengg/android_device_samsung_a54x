@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [A546E, A546B]
+        target: [SM-A546E, SM-A546B, SM-A546S, SM-A546U, SM-A546U1, SM-A546W]
         
     steps:          
       - name: Cleanup
@@ -68,12 +68,7 @@ jobs:
           curl https://raw.githubusercontent.com/Vaz15k/literate-potato/master/Tools/magiskboot -o ~/bin/magiskboot
           chmod a+x ~/bin/magiskboot
           sudo ln -sf ~/bin/magiskboot /usr/bin/magiskboot
-          
-          if [ "${{ matrix.target }}" == "A546B" ]; then
-            wget -t 3 --timeout=30  https://vaz15k.github.io/literate-potato/Imagens/A546B/recovery.img -O ~/twrp-build/recovery-A546B.img || curl https://raw.githubusercontent.com/Vaz15k/literate-potato/master/Imagens/A546B/recovery.img -o ~/twrp-build/recovery-A546B.img
-          elif [ "${{ matrix.target }}" == "A546E" ]; then
-            wget -t 3 --timeout=30  https://vaz15k.github.io/literate-potato/Imagens/A546E/recovery.img -O ~/twrp-build/recovery-A546E.img || curl https://raw.githubusercontent.com/Vaz15k/literate-potato/master/Imagens/A546E/recovery.img -o ~/twrp-build/recovery-A546E.img
-          fi
+          curl --retry 5 --retry-delay 5 https://raw.githubusercontent.com/Vaz15k/literate-potato/master/Imagens/${{matrix.target}}/recovery.img -o ~/twrp-build/recovery-${{matrix.target}}.img
           
       - name: Initialize repo
         run: |
@@ -86,15 +81,6 @@ jobs:
       - name: Cloning Trees
         run: |
           git clone --branch fox-12.1 https://github.com/Vaz15k/android_device_samsung_a54x.git device/samsung/a54x
-        working-directory: ./fox-12.1
-
-      - name: Removing TEE Files
-        run: |
-          if [ "${{ matrix.target }}" == "A546B" ]; then
-            rm -fr device/samsung/a54x/recovery/root/vendor/tee/A546E*
-          elif [ "${{ matrix.target }}" == "A546E" ]; then
-            rm -fr device/samsung/a54x/recovery/root/vendor/tee/A546B*
-          fi
         working-directory: ./fox-12.1
       
       - name: Build Recovery
@@ -124,7 +110,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: /home/runner/files/OFRP*
-          name: TWRP / OFRP
+          name: OrangeFox 12.1
           tag_name: "${{ env.DATE }}"
           body: |
             VBMeta Patched:
