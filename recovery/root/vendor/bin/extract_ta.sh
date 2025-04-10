@@ -29,6 +29,8 @@ if mount -o ro "/dev/block/mapper/vendor" "/tmp/vendor"; then
     tee_dir="/tmp/vendor/tee_sea"
   elif [ "$model" = "SM-A546B" ] && [ -d "/tmp/vendor/tee_eur" ]; then
     tee_dir="/tmp/vendor/tee_eur"
+  elif [ "$model" = "SM-A5460" ] && [ -d "/tmp/vendor/tee_asia" ]; then
+    tee_dir="/tmp/vendor/tee_asia"
   else
     tee_dir="/tmp/vendor/tee"
   fi
