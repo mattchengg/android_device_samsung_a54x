@@ -1,0 +1,62 @@
+From 6bc570681323fdcd9b319d12bb8b7b767c20b72d Mon Sep 17 00:00:00 2001
+From: mattchengg <mattcheng20080205@gmail.com>
+Date: Fri, 24 Apr 2026 09:17:35 +0800
+Subject: [PATCH] updater: remap read-only dynamic partitions as writable
+ during OTA
+
+Signed-off-by: mattchengg <mattcheng20080205@gmail.com>
+---
+ .../updater_runtime_dynamic_partitions.cpp    | 23 +++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
+
+diff --git a/updater/updater_runtime_dynamic_partitions.cpp b/updater/updater_runtime_dynamic_partitions.cpp
+index 6570cff..e3b88e6 100644
+--- a/updater/updater_runtime_dynamic_partitions.cpp
++++ b/updater/updater_runtime_dynamic_partitions.cpp
+@@ -45,6 +45,14 @@ using android::fs_mgr::SlotNumberForSlotSuffix;
+ 
+ static constexpr std::chrono::milliseconds kMapTimeout{ 1000 };
+ 
++namespace updater {
++
++bool ShouldRecreateWritableLogicalPartition(android::dm::DmDeviceState state) {
++  return state == DmDeviceState::ACTIVE;
++}
++
++}  // namespace updater
++
+ static std::string GetSuperDevice() {
+   return "/dev/block/by-name/" + fs_mgr_get_super_partition_name();
+ }
+@@ -70,6 +78,17 @@ bool UpdaterRuntime::MapPartitionOnDeviceMapper(const std::string& partition_nam
+                                                 std::string* path) {
+   auto partition_name_suffix = AddSlotSuffix(partition_name);
+   auto state = DeviceMapper::Instance().GetState(partition_name_suffix);
++  if (updater::ShouldRecreateWritableLogicalPartition(state)) {
++    // Some recoveries pre-map logical partitions as read-only dm devices for browsing / mounting.
++    // Recreate the mapping so block_image_update() always gets a writable target.
++    if (!DestroyLogicalPartition(partition_name_suffix)) {
++      LOG(ERROR) << "Failed to destroy active logical partition " << partition_name_suffix
++                 << " before recreating it as writable.";
++      return false;
++    }
++    state = DeviceMapper::Instance().GetState(partition_name_suffix);
++  }
++
+   if (state == DmDeviceState::INVALID) {
+     CreateLogicalPartitionParams params = {
+       .block_device = GetSuperDevice(),
+@@ -84,10 +103,6 @@ bool UpdaterRuntime::MapPartitionOnDeviceMapper(const std::string& partition_nam
+     };
+     return CreateLogicalPartition(params, path);
+   }
+-
+-  if (state == DmDeviceState::ACTIVE) {
+-    return DeviceMapper::Instance().GetDmDevicePathByName(partition_name_suffix, path);
+-  }
+   LOG(ERROR) << "Unknown device mapper state: "
+              << static_cast<std::underlying_type_t<DmDeviceState>>(state);
+   return false;
+-- 
+2.53.0
+
