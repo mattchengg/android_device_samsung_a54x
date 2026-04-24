@@ -6,12 +6,7 @@ on:
 jobs:
   build_recovery:
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        target: [SM-A546E, SM-A546B, SM-A546S, SM-A546U, SM-A546U1, SM-A546W, SM-A5460, SM-A546V]
-        
+    
     steps:          
       - name: Cleanup
         uses: rokibhasansagar/slimhub_actions@main
@@ -58,18 +53,6 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Clean Dir
-        run: |
-          ls | xargs rm -fr
-
-      - name: Prepare extra files
-        run: |
-          mkdir ~/twrp-build
-          curl https://raw.githubusercontent.com/Vaz15k/literate-potato/master/Tools/magiskboot -o ~/bin/magiskboot
-          chmod a+x ~/bin/magiskboot
-          sudo ln -sf ~/bin/magiskboot /usr/bin/magiskboot
-          curl --retry 5 --retry-delay 5 https://raw.githubusercontent.com/Vaz15k/literate-potato/master/Imagens/${{matrix.target}}/recovery.img -o ~/twrp-build/recovery-${{matrix.target}}.img
-          
       - name: Initialize repo
         run: |
           export WORK_DIR="$(pwd)"
@@ -94,22 +77,11 @@ jobs:
           lunch twrp_a54x-eng && make clean && mka recoveryimage
         working-directory: ./fox-12.1
 
-      - name: Repack Image
-        run: |
-          mkdir ~/files
-          cp out/target/product/a54x/recovery.img ~/twrp-build/ofrp.img
-          cd ~/twrp-build
-          magiskboot unpack ofrp.img
-          magiskboot repack recovery-${{ matrix.target }}.img recovery.img
-          tar cf OFRP-${{ matrix.target }}_$(date +"%Y-%m-%d").tar recovery.img
-          cp OFRP* ~/files
-        working-directory: ./fox-12.1
-
       - name: Publish to GitHub
         id: release
         uses: softprops/action-gh-release@v2
         with:
-          files: /home/runner/files/OFRP*
+          files: /home/runner/work/android_device_samsung_a54x/android_device_samsung_a54x/fox-12.1/out/target/product/a54x/recovery.img
           name: OrangeFox 12.1
           tag_name: "${{ env.DATE }}"
           body: |
