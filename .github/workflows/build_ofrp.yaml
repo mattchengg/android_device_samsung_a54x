@@ -65,6 +65,11 @@ jobs:
         run: |
           git clone --branch fox-12.1 https://github.com/mattchengg/android_device_samsung_a54x.git device/samsung/a54x
         working-directory: ./fox-12.1
+
+      - name: Apply recovery patch
+        run: |
+          git -C bootable/recovery am --3way "$GITHUB_WORKSPACE/twrp-recovery/0001-fix-twrp-prepare-super-mappings-in-TWRP.patch"
+        working-directory: ./fox-12.1
       
       - name: Build Recovery
         run: |
