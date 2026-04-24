@@ -93,14 +93,13 @@ jobs:
           source build/envsetup.sh
           set -e
           lunch twrp_a54x-eng && make clean && mka recoveryimage
-          tar cf OFRP-a54x_$(date +"%Y-%m-%d").tar recovery.img
         working-directory: ./fox-12.1
 
       - name: Publish to GitHub
         id: release
         uses: softprops/action-gh-release@v2
         with:
-          files: /home/runner/files/OFRP*.tar
+          files: /home/runner/work/android_device_samsung_a54x/android_device_samsung_a54x/fox-12.1/out/target/product/a54x/*.zip
           name: OrangeFox 12.1
           tag_name: "${{ env.DATE }}"
           body: |
