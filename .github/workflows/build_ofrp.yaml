@@ -68,7 +68,7 @@ jobs:
 
       - name: Apply recovery patch
         run: |
-          git -C bootable/recovery am --3way "$GITHUB_WORKSPACE/twrp-recovery/0001-fix-twrp-prepare-super-mappings-in-TWRP.patch"
+          git -C bootable/recovery apply --3way "$GITHUB_WORKSPACE/twrp-recovery/0001-fix-twrp-prepare-super-mappings-in-TWRP.patch"
         working-directory: ./fox-12.1
       
       - name: Build Recovery
